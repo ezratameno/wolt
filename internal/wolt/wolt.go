@@ -1,12 +1,14 @@
+// wolt handles the wolt rest api.
 package wolt
 
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"time"
+
+	h "github.com/ezratameno/wolt/pkg/http"
 )
 
 type Wolt struct {
@@ -24,11 +26,14 @@ func New(token string) *Wolt {
 //GetOrders returns the orders.
 func (c Wolt) GetOrders() (Orders, error) {
 	var res Orders
+	headers := make(map[string]string)
+	headers["Content-Type"] = "application/json"
+	headers["Authorization"] = "Bearer " + c.token
 	// go through every 100 orders
 	for i := 0; ; i += 100 {
 		url := fmt.Sprintf("https://restaurant-api.wolt.com/v2/order_details/?limit=100&skip=%s",
 			strconv.Itoa(i))
-		resp, err := c.request(http.MethodGet, url, nil)
+		resp, err := h.Request(http.MethodGet, url, nil, headers)
 		if err != nil {
 			return nil, err
 		}
@@ -66,24 +71,4 @@ func (c Wolt) GetSummary() error {
 	}
 	fmt.Println("Total Orders value: ", counter)
 	return nil
-}
-
-// request make a http request and returns the result.
-func (c Wolt) request(method string, url string, body io.Reader) ([]byte, error) {
-	req, err := http.NewRequest(method, url, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+c.token)
-	resp, err := c.do.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	b, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
 }

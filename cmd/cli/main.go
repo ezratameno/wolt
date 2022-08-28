@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ezratameno/wolt/pkg/wolt"
+	"github.com/ezratameno/wolt/internal/wolt"
 )
 
 func main() {
