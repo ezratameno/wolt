@@ -23,7 +23,7 @@ func New(token string) *Wolt {
 	}
 }
 
-//GetOrders returns the orders.
+// GetOrders returns the orders.
 func (c Wolt) GetOrders() (Orders, error) {
 	var res Orders
 	headers := make(map[string]string)
@@ -61,9 +61,8 @@ func (c Wolt) GetSummary() error {
 	}
 	var counter int
 	for _, order := range orders {
-		// TODO: fix the year format
-		time := time.Unix(order.PaymentTime.Date, 0)
-		fmt.Println("Time:", time.UTC())
+		paymentTime := time.UnixMilli(order.PaymentTime.Date)
+		fmt.Println("Time:", paymentTime.Format("02-01-2006 15:04:05"))
 		fmt.Println("Food Price:", order.ItemsPrice/100)
 		fmt.Println("Delivery Price:", order.PaymentAmount/100-order.ItemsPrice/100)
 		fmt.Println("Total Price:", order.PaymentAmount/100)
